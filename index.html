@@ -4,200 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Birthday Surprise</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&family=Baskervville:ital@1&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { 
-            --magenta: #ff00ff; 
-            --forest-mid: #2e8b57; 
-            --emerald: #50c878;
+        :root {
+            --primary-green: #90EE90;
+            --dark-bg: #050a05;
         }
-        
         body {
-            background: #000;
-            color: #fff;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            -webkit-user-select: none; user-select: none;
+            margin: 0; padding: 0;
+            background: radial-gradient(circle at center, #0a1f0a 0%, #000 100%);
+            color: white; font-family: 'Segoe UI', sans-serif;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden;
         }
 
-        /* Star Backdrop */
-        .star-bg { position: absolute; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.8; animation: twinkle 2s infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
-
-        /* Sparkles for Finale */
-        #sparkle-field { position: absolute; width: 100%; height: 100%; z-index: -1; pointer-events: none; display: none; }
-        .sparkle { position: absolute; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); animation: glitter 1.5s infinite ease-in-out; }
-        @keyframes glitter { 0%, 100% { transform: scale(0.5); opacity: 0.2; } 50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 5px var(--emerald)); } }
-
-        /* Floating Hearts */
-        .heart-viewport { position: absolute; width: 100%; height: 100%; z-index: -1; display: none; overflow: hidden; }
-        .iphone-heart { 
-            position: absolute; width: 150px; height: 150px; 
-            clip-path: path('M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z');
-            animation: float-up 9s infinite ease-in; opacity: 0.6; transition: background 1.5s ease;
+        /* 1. Login Interface */
+        .gateway {
+            text-align: center; background: rgba(255,255,255,0.05);
+            padding: 40px; border-radius: 20px; border: 1px solid var(--primary-green);
+            backdrop-filter: blur(10px); transition: 0.5s; z-index: 10;
         }
-        .heart-magenta { background: radial-gradient(circle at 35% 35%, #ff99ff 0%, #ff00ff 40%, #800080 100%); }
-        .heart-pink { background: radial-gradient(circle at 35% 35%, #ffcfea 0%, #ff66b2 45%, #cc0066 100%); }
-        .hearts-green .heart-magenta { background: radial-gradient(circle at 35% 35%, #d1f2d1 0%, var(--forest-mid) 40%, #1e452e 100%); }
-        .hearts-green .heart-pink { background: radial-gradient(circle at 35% 35%, #e8f9ed 0%, var(--emerald) 45%, #2d5a3e 100%); }
-
-        @keyframes float-up { 
-            0% { transform: translateY(110vh) scale(0.7) rotate(0deg); opacity: 0; }
-            15% { opacity: 0.6; } 100% { transform: translateY(-40vh) scale(1.4) rotate(20deg); opacity: 0; }
+        #secret-key {
+            background: transparent; border: none; border-bottom: 2px solid var(--primary-green);
+            color: var(--primary-green); font-size: 1.5rem; text-align: center;
+            margin: 20px 0; outline: none; width: 80%;
+        }
+        .btn {
+            background: var(--primary-green); color: black; border: none;
+            padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer;
         }
 
-        /* Step 1: Login UI */
-        .interface-card { text-align: center; font-family: 'Playfair Display', serif; }
-        h1 { font-size: 3.2rem; font-style: italic; color: var(--magenta); margin-bottom: 20px; }
-        .pw-label { color: var(--magenta); margin-bottom: 20px; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px; }
-        #pass-input { border: none; border-bottom: 1px solid var(--magenta); background: none; color: var(--magenta); padding: 10px; font-size: 1.2rem; text-align: center; outline: none; margin-bottom: 40px; width: 180px; }
-        .btn-enter { background: transparent; color: var(--magenta); border: 1px solid var(--magenta); padding: 12px 45px; border-radius: 30px; cursor: pointer; letter-spacing: 2px; font-family: 'Baskervville', serif; }
-
-        /* Step 2: Clean Tiered Cake */
-        .cake-stage { position: relative; width: 300px; height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+        /* 2. Main Content Interface */
+        #main-content { display: none; text-align: center; animation: fadeIn 1.5s ease-in; width: 90%; }
         
-        .cake-tier-bottom { 
-            width: 260px; height: 150px; background: #fff; border-radius: 12px 12px 8px 8px; 
-            position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 5; 
-        }
-        
-        .cake-tier-top { 
-            width: 185px; height: 110px; background: #fff; border-radius: 10px 10px 4px 4px; 
-            position: absolute; bottom: 150px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 7; 
+        .bday-title { 
+            font-size: 2rem; color: var(--primary-green); 
+            text-shadow: 0 0 20px rgba(144, 238, 144, 0.5); 
+            margin-bottom: 5px;
         }
 
-        /* Bows and Flowers strictly on Top Tier */
-        .bow-point { position: absolute; font-size: 38px; top: -20px; z-index: 10; }
-        .flower-row { position: absolute; top: -8px; left: 0; width: 100%; display: flex; justify-content: center; gap: 4px; z-index: 9; }
-        .small-flower { font-size: 16px; }
+        /* 3D Cake Design */
+        .cake { position: relative; width: 120px; height: 80px; background: #fdf5e6; border-radius: 10px 10px 0 0; margin: 40px auto; box-shadow: 0 8px var(--primary-green); }
+        .cake::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 25px; background: #fff; border-radius: 10px 10px 50% 50%; }
+        .candles-box { position: absolute; top: -35px; width: 100%; display: flex; justify-content: center; gap: 8px; }
+        .candle { font-size: 30px; cursor: pointer; filter: grayscale(1); transition: 0.3s; }
+        .lit { filter: grayscale(0) drop-shadow(0 0 15px gold); transform: scale(1.2); }
 
-        .candle-container { display: flex; justify-content: center; gap: 35px; position: absolute; bottom: 265px; width: 100%; z-index: 12; }
-        .dev-candle { width: 14px; height: 65px; background: linear-gradient(to right, var(--magenta), #ff80ff, var(--magenta)); border-radius: 4px; position: relative; cursor: pointer; opacity: 0.4; transition: 0.3s; }
-        .flame { position: absolute; top: -22px; left: -2px; width: 18px; height: 26px; background: radial-gradient(circle, #fff, gold, orange); border-radius: 50% 50% 20% 20%; display: none; }
-        .lit { opacity: 1 !important; transform: translateY(-5px); }
-        .lit .flame { display: block; animation: flicker 0.1s infinite alternate; }
-
-        /* Step 3: Finale */
-        .finale { 
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            height: 100vh; width: 100vw; box-sizing: border-box;
-            padding-top: 5vh; padding-bottom: 5vh; 
+        /* Polaroid Image */
+        .polaroid { 
+            background: #fff; padding: 10px 10px 50px 10px; border-radius: 2px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; 
+            transform: rotate(2deg); margin: 20px auto; max-width: 280px;
         }
-        .photo-wrap { border: 12px solid white; outline: 3.5px solid var(--forest-mid); outline-offset: 8px; border-radius: 2px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); z-index: 10; }
-        .baby-pic { width: 320px; height: 450px; object-fit: cover; display: block; }
-        .caption-group { text-align: center; z-index: 10; margin-top: 4vh; margin-bottom: 2vh; }
-        .caption { font-size: 2.3rem; color: var(--forest-mid); font-style: italic; font-family: 'Playfair Display', serif; }
-        .caption-line2 { font-size: 1.8rem; margin-top: 10px; color: var(--forest-mid); font-family: 'Playfair Display', serif; font-style: italic;}
+        .baby-pic { width: 100%; height: 280px; object-fit: cover; border: 1px solid #eee; }
+        .handwritten { 
+            position: absolute; bottom: 10px; width: 100%; left: 0; color: #333; 
+            font-family: 'Brush Script MT', cursive; font-size: 1.8rem; text-align: center; 
+        }
+
+        /* Floating Stars */
+        .star { position: absolute; background: white; border-radius: 50%; animation: float 5s infinite linear; z-index: -1; }
+        @keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <audio id="bday-song" loop><source src="https://files.catbox.moe/u0fkv2.mp3" type="audio/mpeg"></audio>
+    <audio id="bg-music" loop>
+        <source src="https://raw.githubusercontent.com/AnshulSoni20/Birthday-Web/main/dandelions.mp3" type="audio/mpeg">
+    </audio>
 
-    <div class="star-bg" id="star-field"></div>
-    <div id="sparkle-field"></div>
-    <div class="heart-viewport" id="heart-field"></div>
-
-    <div id="step1" class="interface-card">
-        <h1>A little something for you.</h1>
-        <div class="pw-label">enter the secret key 🗝️</div>
-        <input type="password" id="pass-input" placeholder="CODE">
-        <br><button class="btn-enter" onclick="unlock()">Open</button>
+    <div id="login-screen" class="gateway">
+        <h2 style="color: var(--primary-green);">Access Restricted</h2>
+        <p>Enter the secret key to unlock your surprise</p>
+        <input type="password" id="secret-key" placeholder="••••">
+        <br><button class="btn" onclick="checkKey()">Unlock 🔓</button>
     </div>
 
-    <div id="step2" style="display:none; text-align: center;">
-        <div style="color: var(--magenta); font-size: 2rem; margin-bottom: 40px; font-style: italic;">light the candles :3</div>
-        <div class="cake-stage">
-            <div class="candle-container">
-                <div class="dev-candle" onclick="light(this)"><div class="flame"></div></div>
-                <div class="dev-candle" onclick="light(this)"><div class="flame"></div></div>
-                <div class="dev-candle" onclick="light(this)"><div class="flame"></div></div>
-            </div>
-            
-            <div class="cake-tier-top">
-                <div class="flower-row">
-                    <span class="small-flower">🌸</span><span class="small-flower">🌸</span><span class="small-flower">🌸</span><span class="small-flower">🌸</span><span class="small-flower">🌸</span>
-                </div>
-                <span class="bow-point" style="left: -10px;">🎀</span>
-                <span class="bow-point" style="right: -10px;">🎀</span>
-            </div>
-            
-            <div class="cake-tier-bottom">
-                <!-- Clean, undecorated bottom tier -->
+    <div id="cake-screen" style="display:none; text-align: center;">
+        <h2 style="color: var(--primary-green);">Light the candles...</h2>
+        <div class="cake">
+            <div class="candles-box">
+                <span class="candle" onclick="ignite(this)">🕯️</span>
+                <span class="candle" onclick="ignite(this)">🕯️</span>
+                <span class="candle" onclick="ignite(this)">🕯️</span>
             </div>
         </div>
+        <p style="color: #888;">(Tap each candle)</p>
     </div>
 
-    <div id="step3" style="display:none;">
-        <div class="finale">
-            <div class="photo-wrap"><img src="baby.jpg" class="baby-pic"></div>
-            <div class="caption-group">
-                <div class="caption">happy bday cutieee!!</div>
-                <div class="caption caption-line2">ilysmm <33</div>
-            </div>
+    <div id="main-content">
+        <h1 class="bday-title">HAPPY BIRTHDAY!</h1>
+        <div class="polaroid">
+            <img src="baby.jpg" class="baby-pic">
+            <div class="handwritten">ilysmm bhondu! <33</div>
         </div>
+        <p style="color: var(--primary-green); margin-top: 10px;">Tap anywhere for more magic</p>
     </div>
 
     <script>
-        const stars = document.getElementById('star-field');
-        for(let i=0; i<70; i++) {
-            let s = document.createElement('div'); s.className = 'star';
-            s.style.width = s.style.height = (Math.random() * 2 + 1) + 'px';
-            s.style.top = Math.random()*100+'vh'; s.style.left = Math.random()*100+'vw';
-            stars.appendChild(s);
+        // Stars generation
+        for (let i = 0; i < 40; i++) {
+            let star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.width = star.style.height = Math.random() * 3 + 'px';
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            star.style.opacity = Math.random();
+            document.body.appendChild(star);
         }
 
-        const sparkleField = document.getElementById('sparkle-field');
-        for(let i=0; i<60; i++) {
-            let sp = document.createElement('div'); sp.className = 'sparkle';
-            sp.style.width = sp.style.height = (Math.random() * 6 + 4) + 'px';
-            sp.style.top = Math.random()*100+'vh'; sp.style.left = Math.random()*100+'vw';
-            sp.style.backgroundColor = Math.random() > 0.5 ? 'var(--forest-mid)' : 'var(--emerald)';
-            sparkleField.appendChild(sp);
-        }
-
-        const heartField = document.getElementById('heart-field');
-        for(let i=0; i<15; i++) { 
-            let h = document.createElement('div');
-            h.className = `iphone-heart ${Math.random() > 0.5 ? 'heart-magenta' : 'heart-pink'}`;
-            h.style.left = Math.random() * 100 + 'vw';
-            h.style.animationDelay = (Math.random() * 4) + 's';
-            heartField.appendChild(h);
-        }
-
+        const music = document.getElementById('bg-music');
         let litCount = 0;
-        function unlock() {
-            if(document.getElementById('pass-input').value.toLowerCase() === "iambhondu") {
-                document.getElementById('step1').style.display = 'none';
-                document.getElementById('star-field').style.display = 'none';
-                document.getElementById('heart-field').style.display = 'block';
-                document.getElementById('step2').style.display = 'block';
-                document.getElementById('bday-song').play();
+
+        function checkKey() {
+            const key = document.getElementById('secret-key').value.toLowerCase();
+            
+            // CHANGE YOUR PASSWORD HERE:
+            if (key === "iambhondu") { 
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('cake-screen').style.display = 'block';
+                
+                // Music starts exactly when "Unlock" is clicked
+                music.play().catch(e => console.log("Music interaction required"));
+            } else {
+                alert("Wrong key, try again!");
             }
         }
 
-        function light(el) {
+        function ignite(el) {
             if(!el.classList.contains('lit')) {
                 el.classList.add('lit');
                 litCount++;
                 if(litCount === 3) {
                     setTimeout(() => {
-                        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 }, colors: ['#2e8b57', '#50c878', '#ffffff'] });
-                        document.getElementById('step2').style.display = 'none';
-                        document.getElementById('step3').style.display = 'flex';
-                        document.getElementById('sparkle-field').style.display = 'block';
-                        document.getElementById('heart-field').classList.add('hearts-green');
+                        confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, colors: ['#90EE90', '#ffffff'] });
+                        document.getElementById('cake-screen').style.display = 'none';
+                        document.getElementById('main-content').style.display = 'block';
                     }, 800);
                 }
             }
         }
+
+        // Tap for extra confetti after unlock
+        document.addEventListener('click', function() {
+            if (document.getElementById('main-content').style.display === 'block') {
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#90EE90'] });
+            }
+        });
     </script>
 </body>
 </html>
+
+        
