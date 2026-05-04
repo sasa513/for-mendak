@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +20,7 @@
             height: 100vh; overflow: hidden; position: relative;
         }
 
-        /* Twinkling Stars */
+        /* Twinkling Stars Background */
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) infinite; opacity: 0; }
         @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: 0.8; } }
 
@@ -43,7 +44,7 @@
         .candle { font-size: 32px; cursor: pointer; filter: grayscale(1); transition: 0.4s; }
         .lit { filter: grayscale(0) drop-shadow(0 0 15px gold); transform: scale(1.2); }
 
-        /* Final Card */
+        /* Final Card Content */
         #main-content { display: none; text-align: center; width: 90%; animation: zoomIn 1s ease; }
         .card { background: rgba(255, 255, 255, 0.07); padding: 30px; border-radius: 20px; border: 1px solid rgba(144, 238, 144, 0.3); backdrop-filter: blur(15px); }
         
@@ -65,7 +66,7 @@
 <body>
 
     <audio id="bg-music" loop muted playsinline>
-        <source src="https://raw.githubusercontent.com/AnshulSoni20/Birthday-Web/main/dandelions.mp3" type="audio/mpeg">
+        <source src="Dandelions-Instrumental.mp3" type="audio/mpeg">
     </audio>
 
     <div id="login-screen">
@@ -86,7 +87,7 @@
     <div id="main-content">
         <div class="card">
             <img src="baby.jpg" class="profile-img">
-            <h1 class="bday-text">Happy Birthday my cutieee!</h1> 
+            <h1 class="bday-text">Happy Birthday My Cutieee!!</h1> 
             <p class="wish"> Thanks for staying and being patient with me. 
 Happy 21st Namann!! 
 You're nice really, and I love how you are actually multi-talented. It's kinda hot lol.
@@ -97,7 +98,7 @@ Just take care of yourself and stay smiling always. I love your smile frr
     </div>
 
     <script>
-        // Stars
+        // Stars Logic
         for (let i = 0; i < 50; i++) {
             let star = document.createElement('div');
             star.className = 'star';
@@ -117,11 +118,10 @@ Just take care of yourself and stay smiling always. I love your smile frr
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('cake-screen').style.display = 'block';
                 
-                // --- THE UNMUTE FIX ---
+                // Audio Trigger with Mute/Unmute bypass
                 music.play().then(() => {
-                    music.muted = false; // Android only allows unmute AFTER a tap
+                    music.muted = false;
                 }).catch(() => {
-                    // Fail-safe: try again on next tap if first one is blocked
                     document.addEventListener('click', () => { 
                         music.muted = false;
                         music.play(); 
