@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,130 +7,130 @@
     <title>Birthday Surprise</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root {
-            --primary-green: #90EE90;
-            --dark-bg: #050a05;
+        :root { 
+            --primary-green: #90EE90; 
+            --dark-green: #1b4d1b;
+            --bg-black: #050a05;
         }
-        body {
-            margin: 0; padding: 0;
-            background: radial-gradient(circle at center, #0a1f0a 0%, #000 100%);
-            color: white; font-family: 'Segoe UI', sans-serif;
-            display: flex; justify-content: center; align-items: center;
-            height: 100vh; overflow: hidden;
+        body { 
+            margin: 0; padding: 0; 
+            background: radial-gradient(circle, #0a1f0a 0%, #000 100%); 
+            color: white; font-family: 'Segoe UI', sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; overflow: hidden; 
         }
 
-        /* 1. Login Interface */
-        .gateway {
-            text-align: center; background: rgba(255,255,255,0.05);
-            padding: 40px; border-radius: 20px; border: 1px solid var(--primary-green);
-            backdrop-filter: blur(10px); transition: 0.5s; z-index: 10;
+        /* 1. Login Screen */
+        #login-screen { 
+            text-align: center; z-index: 100; background: rgba(0,0,0,0.85); 
+            padding: 40px; border-radius: 25px; border: 1.5px solid var(--primary-green);
+            backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(144, 238, 144, 0.2);
         }
-        #secret-key {
-            background: transparent; border: none; border-bottom: 2px solid var(--primary-green);
-            color: var(--primary-green); font-size: 1.5rem; text-align: center;
-            margin: 20px 0; outline: none; width: 80%;
+        #secret-key { 
+            background: transparent; border: none; border-bottom: 2px solid var(--primary-green); 
+            color: var(--primary-green); font-size: 1.5rem; text-align: center; 
+            margin: 20px 0; outline: none; width: 180px; 
         }
         .btn {
             background: var(--primary-green); color: black; border: none;
             padding: 12px 30px; border-radius: 25px; font-weight: bold; cursor: pointer;
         }
 
-        /* 2. Main Content Interface */
-        #main-content { display: none; text-align: center; animation: fadeIn 1.5s ease-in; width: 90%; }
-        
-        .bday-title { 
-            font-size: 2rem; color: var(--primary-green); 
-            text-shadow: 0 0 20px rgba(144, 238, 144, 0.5); 
-            margin-bottom: 5px;
-        }
-
-        /* 3D Cake Design */
-        .cake { position: relative; width: 120px; height: 80px; background: #fdf5e6; border-radius: 10px 10px 0 0; margin: 40px auto; box-shadow: 0 8px var(--primary-green); }
-        .cake::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 25px; background: #fff; border-radius: 10px 10px 50% 50%; }
-        .candles-box { position: absolute; top: -35px; width: 100%; display: flex; justify-content: center; gap: 8px; }
-        .candle { font-size: 30px; cursor: pointer; filter: grayscale(1); transition: 0.3s; }
+        /* 2. Interactive Cake */
+        #cake-screen { display: none; text-align: center; z-index: 90; }
+        .cake { position: relative; width: 130px; height: 90px; background: #fdf5e6; border-radius: 10px 10px 0 0; margin: 40px auto; box-shadow: 0 8px var(--dark-green); }
+        .candles-box { position: absolute; top: -35px; width: 100%; display: flex; justify-content: center; gap: 10px; }
+        .candle { font-size: 32px; cursor: pointer; filter: grayscale(1); transition: 0.4s; }
         .lit { filter: grayscale(0) drop-shadow(0 0 15px gold); transform: scale(1.2); }
 
-        /* Polaroid Image */
-        .polaroid { 
-            background: #fff; padding: 10px 10px 50px 10px; border-radius: 2px; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; 
-            transform: rotate(2deg); margin: 20px auto; max-width: 280px;
+        /* 3. Final Content (Balloons & Card) */
+        #main-content { display: none; text-align: center; width: 90%; animation: zoomIn 1s ease; }
+        .card { 
+            background: rgba(255, 255, 255, 0.07); padding: 30px; border-radius: 20px; 
+            border: 1px solid rgba(144, 238, 144, 0.3); backdrop-filter: blur(15px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
-        .baby-pic { width: 100%; height: 280px; object-fit: cover; border: 1px solid #eee; }
-        .handwritten { 
-            position: absolute; bottom: 10px; width: 100%; left: 0; color: #333; 
-            font-family: 'Brush Script MT', cursive; font-size: 1.8rem; text-align: center; 
-        }
+        .profile-img { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--primary-green); object-fit: cover; margin-bottom: 15px; }
+        .bday-text { font-size: 2.2rem; margin: 10px 0; color: var(--primary-green); text-shadow: 0 0 10px rgba(144,238,144,0.4); }
+        .wish { font-size: 1.05rem; line-height: 1.6; color: #eee; font-style: italic; }
 
-        /* Floating Stars */
-        .star { position: absolute; background: white; border-radius: 50%; animation: float 5s infinite linear; z-index: -1; }
-        @keyframes float { from { transform: translateY(100vh); } to { transform: translateY(-10vh); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Floating Balloons Animation */
+        .balloon { position: absolute; bottom: -100px; width: 45px; height: 55px; border-radius: 50%; opacity: 0.7; animation: fly 8s infinite ease-in; z-index: -1; }
+        @keyframes fly { 
+            0% { transform: translateY(0) rotate(0deg); } 
+            100% { transform: translateY(-120vh) rotate(25deg); } 
+        }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <audio id="bg-music" loop>
+    <audio id="bg-music" loop preload="auto">
         <source src="https://raw.githubusercontent.com/AnshulSoni20/Birthday-Web/main/dandelions.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="login-screen" class="gateway">
-        <h2 style="color: var(--primary-green);">Access Restricted</h2>
-        <p>Enter the secret key to unlock your surprise</p>
+    <div id="login-screen">
+        <h2 style="color: var(--primary-green); margin-top: 0;">Private Surprise</h2>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Enter the secret key</p>
         <input type="password" id="secret-key" placeholder="••••">
         <br><button class="btn" onclick="checkKey()">Unlock 🔓</button>
     </div>
 
-    <div id="cake-screen" style="display:none; text-align: center;">
+    <div id="cake-screen">
         <h2 style="color: var(--primary-green);">Light the candles...</h2>
-        <div class="cake">
-            <div class="candles-box">
-                <span class="candle" onclick="ignite(this)">🕯️</span>
-                <span class="candle" onclick="ignite(this)">🕯️</span>
-                <span class="candle" onclick="ignite(this)">🕯️</span>
-            </div>
-        </div>
-        <p style="color: #888;">(Tap each candle)</p>
+        <div class="cake"><div class="candles-box">
+            <span class="candle" onclick="ignite(this)">🕯️</span>
+            <span class="candle" onclick="ignite(this)">🕯️</span>
+            <span class="candle" onclick="ignite(this)">🕯️</span>
+        </div></div>
+        <p style="color: #888; font-size: 0.8rem;">(Tap each one)</p>
     </div>
 
     <div id="main-content">
-        <h1 class="bday-title">HAPPY BIRTHDAY!</h1>
-        <div class="polaroid">
-            <img src="baby.jpg" class="baby-pic">
-            <div class="handwritten">ilysmm bhondu! <33</div>
+        <div class="card">
+            <img src="baby.jpg" class="profile-img">
+            <h1 class="bday-text">Happy Birthday cutieee!</h1> 
+            <p class="wish">"Thanks for staying and being patient with me. 
+Happy 21st Namann!! 
+You're nice really, and I love how you are actually multi-talented. It's kinda hot lol.
+Just take care of yourself and stay smiling always. I love your smile frr
+:3"</p>
+            <p style="color: var(--primary-green); font-weight: bold; margin-top: 20px; letter-spacing: 2px;">ilysmm! 💚</p>
         </div>
-        <p style="color: var(--primary-green); margin-top: 10px;">Tap anywhere for more magic</p>
     </div>
 
     <script>
-        // Stars generation
-        for (let i = 0; i < 40; i++) {
-            let star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.width = star.style.height = Math.random() * 3 + 'px';
-            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            star.style.opacity = Math.random();
-            document.body.appendChild(star);
-        }
-
         const music = document.getElementById('bg-music');
         let litCount = 0;
 
+        function createBalloons() {
+            for(let i=0; i<20; i++) {
+                let b = document.createElement('div');
+                b.className = 'balloon';
+                b.style.left = Math.random() * 100 + 'vw';
+                b.style.animationDelay = Math.random() * 6 + 's';
+                // Random green shades for balloons
+                let greenHue = Math.floor(Math.random() * 60) + 90; 
+                b.style.background = `hsla(${greenHue}, 70%, 60%, 0.7)`;
+                document.body.appendChild(b);
+            }
+        }
+
         function checkKey() {
             const key = document.getElementById('secret-key').value.toLowerCase();
-            
-            // CHANGE YOUR PASSWORD HERE:
+            // CHANGE PASSWORD HERE
             if (key === "iambhondu") { 
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('cake-screen').style.display = 'block';
                 
-                // Music starts exactly when "Unlock" is clicked
-                music.play().catch(e => console.log("Music interaction required"));
-            } else {
-                alert("Wrong key, try again!");
-            }
+                // FORCE MUSIC START
+                music.muted = false;
+                music.play().catch(e => {
+                    console.log("Audio needs extra tap");
+                    // Backup: play on next tap if browser blocks it
+                    document.addEventListener('click', () => { music.play(); }, {once: true});
+                });
+            } else { alert("Try again!"); }
         }
 
         function ignite(el) {
@@ -138,22 +139,17 @@
                 litCount++;
                 if(litCount === 3) {
                     setTimeout(() => {
-                        confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, colors: ['#90EE90', '#ffffff'] });
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#90EE90', '#ffffff'] });
                         document.getElementById('cake-screen').style.display = 'none';
                         document.getElementById('main-content').style.display = 'block';
+                        createBalloons();
                     }, 800);
                 }
             }
         }
-
-        // Tap for extra confetti after unlock
-        document.addEventListener('click', function() {
-            if (document.getElementById('main-content').style.display === 'block') {
-                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#90EE90'] });
-            }
-        });
     </script>
 </body>
 </html>
+
 
         
